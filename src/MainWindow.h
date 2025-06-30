@@ -1,32 +1,62 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef INCODE_MAINWINDOW_H
+#define INCODE_MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QTreeView>
-#include <QFileSystemModel>
-#include "Editor.h"
+#include "ISymbolProvider.h"
+#include "CodeAnalyzer.h"
+#include "widgets/CodeEditor.h"
+#include <QThread>
+#include <QProgressBar>
+#include <QLabel>
 
-class MainWindow : public QMainWindow {
+class QTabWidget;
+class QTreeView;
+class QFileSystemModel;
+// class QTextEdit; // No longer needed for editor
+class QProcess;
+class QLineEdit;
+
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
 public:
     MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
 private slots:
     void newFile();
     void openFile();
+    void openFolder();
     void saveFile();
-    void openProject();
-    void fileClicked(const QModelIndex &index);
+    void onFileTreeDoubleClicked(const QModelIndex &index);
+    void onTabCloseRequested(int index);
+    void handleTerminalCommand();
+    void readTerminalOutput();
+    void goToDefinition(const QString &symbolName);
+    void analyzeCode();
+    void onAnalysisFinished(const QList<CodeRepetition> &repetitions);
+    void onIndexingProgress(int progress);
+    void onIndexingFinished();
 
 private:
-    Editor *editor;
-    QTreeView *fileTree;
-    QFileSystemModel *fileModel;
-    QString currentFilePath;
-
-    void createMenu();
+    void openFile(const QString &filePath);
+    void createMenus();
+    void createWidgets();
     void setupLayout();
+    void setupConnections();
+
+    QTabWidget *tabWidget;
+    QTreeView *treeView;
+    QFileSystemModel *fileModel;
+    QTextEdit *terminalOutput; // Still QTextEdit for terminal output
+    QLineEdit *terminalInput;
+    QProcess *terminalProcess;
+    ISymbolProvider *symbolProvider;
+    CodeAnalyzer *codeAnalyzer;
+    QThread *indexingThread;
+    QProgressBar *indexingProgressBar;
+    QLabel *indexingStatusLabel;
 };
 
-#endif // MAINWINDOW_H
+#endif // INCODE_MAINWINDOW_H

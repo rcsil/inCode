@@ -1,36 +1,47 @@
-# inCode
+# inCode IDE
 
-**inCode** é uma IDE de código aberto!
+**inCode** is a lightweight IDE focused on PHP development, built in C++ with Qt6, featuring a modern user interface inspired by Visual Studio Code.
 
-O foco inicial é oferecer um editor de texto simples, é rapido. O desenvolvimento está sendo feito para ambiente **Linux**.
+## Key Features
 
----
+*   **Basic IDE Structure:** Main window with a file tree, tabbed code editor, and an integrated terminal.
+*   **File Management:** Create new files, open existing files, open project folders, and save files.
+*   **Integrated Terminal:** Basic command-line interface within the IDE.
+*   **Code Editor:**
+    *   Line numbering.
+    *   Basic PHP syntax highlighting.
+    *   "Go to Definition" functionality (Ctrl+Click) powered by a simple symbol indexer.
+*   **Code Analysis:** Detects code repetitions in `app` and `resources` folders, ignoring `use`, `class`, and `namespace` declarations.
+*   **Background Indexing:** Project indexing runs in the background with a progress bar, keeping the UI responsive.
 
-## ✨ Funcionalidades Atuais
+## Tech Stack
 
-- Interface gráfica com Qt
-- Editor de texto com fonte monoespaçada
-- Abrir e salvar arquivos
-- Criar novo arquivo
-- Abrir uma pasta de projeto e visualizar os arquivos no painel lateral
-- Abrir arquivos do projeto com um clique
+*   **IDE Framework:** C++ with Qt6
+*   **Build System:** CMake
+*   **Code Analysis:** Custom implementation for symbol indexing and repetition detection.
 
----
+## How to Build
 
-## 📦 Requisitos
+1.  **Prerequisites:**
+    *   A C++ compiler (g++, clang, etc.)
+    *   CMake (version 3.16+)
+    *   Qt6 development libraries
 
-- Sistema operacional: Linux
-- Dependências:
+2.  **Clone the repository:**
+    ```bash
+    git clone <repository-url> # Replace <repository-url> with the actual URL
+    cd inCode
+    ```
 
-```bash
-sudo apt update
-sudo apt install qtbase5-dev qt5-qmake build-essential
-```
+3.  **Configure and build:**
+    ```bash
+    mkdir build
+    cd build
+    cmake ..
+    make
+    ```
 
-- Executar:
-
-```bash
-qmake
-make
-./inCode
-```
+4.  **Run the application:**
+    ```bash
+    ./inCode
+    ```

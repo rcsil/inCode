@@ -1,12 +1,10 @@
-#include <QApplication>
 #include "MainWindow.h"
+#include <QApplication>
 
-void setDarkTheme(QApplication &app);
-
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     QApplication app(argc, argv);
-    setDarkTheme(app);
-    MainWindow window;
-    window.show();
+    MainWindow win;
+    win.show();
     return app.exec();
 }

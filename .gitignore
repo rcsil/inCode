@@ -1,0 +1,33 @@
+# CMake
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+cmake_install.cmake
+install_manifest.txt
+
+# Qt
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+
+# Build output
+build/
+bin/
+lib/
+
+# C++
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# OS-specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
