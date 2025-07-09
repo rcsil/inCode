@@ -39,7 +39,8 @@ private slots:
     void onIndexingProgress(int progress);
     void onIndexingFinished();
 
-private:
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
     void openFile(const QString &filePath);
     void createMenus();
     void createWidgets();
@@ -49,7 +50,7 @@ private:
     QTabWidget *tabWidget;
     QTreeView *treeView;
     QFileSystemModel *fileModel;
-    QTextEdit *terminalOutput; // Still QTextEdit for terminal output
+    QPlainTextEdit *terminalOutput;
     QLineEdit *terminalInput;
     QProcess *terminalProcess;
     ISymbolProvider *symbolProvider;

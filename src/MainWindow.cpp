@@ -18,6 +18,7 @@
 #include <QHBoxLayout>
 #include <QDebug>
 #include <QDir>
+#include <QTextBlock>
 
 #include <QStatusBar>
 
@@ -73,10 +74,13 @@ void MainWindow::createWidgets()
     treeView = new QTreeView(this);
     treeView->setModel(fileModel);
     treeView->setRootIndex(fileModel->index(QDir::currentPath()));
+    treeView->setColumnHidden(1, true);
+    treeView->setColumnHidden(2, true);
+    treeView->setColumnHidden(3, true);
 
-    terminalOutput = new QTextEdit(this);
-    terminalOutput->setReadOnly(true);
-    terminalOutput->setMaximumHeight(200);
+    terminalOutput = new QPlainTextEdit(this);
+    terminalOutput->setReadOnly(true); // Make it read-only for historical output
+    terminalOutput->setPlainText("$ "); // Initial prompt
 
     terminalInput = new QLineEdit(this);
 
@@ -105,6 +109,7 @@ void MainWindow::createWidgets()
     indexingThread->start(); // Start the thread
     codeAnalyzer = new CodeAnalyzer(this);         // Instantiate the code analyzer
 
+    qDebug() << "Terminal setup complete.";
     qDebug() << "createWidgets finished.";
 }
 
@@ -181,8 +186,8 @@ void MainWindow::setupConnections()
     qDebug() << "setupConnections started.";
     connect(treeView, &QTreeView::doubleClicked, this, &MainWindow::onFileTreeDoubleClicked);
     connect(tabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
-    connect(terminalInput, &QLineEdit::returnPressed, this, &MainWindow::handleTerminalCommand);
     connect(terminalProcess, &QProcess::readyReadStandardOutput, this, &MainWindow::readTerminalOutput);
+    connect(terminalInput, &QLineEdit::returnPressed, this, &MainWindow::handleTerminalCommand);
     connect(codeAnalyzer, &CodeAnalyzer::analysisFinished, this, &MainWindow::onAnalysisFinished);
     qDebug() << "setupConnections finished.";
 }
@@ -277,14 +282,23 @@ void MainWindow::onTabCloseRequested(int index)
 
 void MainWindow::handleTerminalCommand()
 {
-    QString command = terminalInput->text() + "\n";
-    terminalProcess->write(command.toUtf8());
+    QString command = terminalInput->text();
     terminalInput->clear();
+    terminalProcess->write((command + "\n").toUtf8());
+    terminalOutput->appendPlainText("$ " + command);
 }
 
 void MainWindow::readTerminalOutput()
 {
-    terminalOutput->append(terminalProcess->readAllStandardOutput());
+    terminalOutput->appendPlainText(terminalProcess->readAllStandardOutput());
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (terminalInput->isVisible() && terminalInput->isEnabled()) {
+        terminalInput->setFocus();
+    }
+    QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::goToDefinition(const QString &symbolName)

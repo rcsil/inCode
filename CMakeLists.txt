@@ -10,6 +10,9 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
+# Add resources
+qt_add_resources(inCode_RESOURCES src/resources.qrc)
+
 # Explicitly list source files
 set(SOURCES
     src/main.cpp
@@ -18,6 +21,7 @@ set(SOURCES
     src/CodeAnalyzer.cpp
     src/widgets/CodeEditor.cpp
     src/widgets/PHPSyntaxHighlighter.cpp
+    ${inCode_RESOURCES}
 )
 
 add_executable(inCode ${SOURCES})
