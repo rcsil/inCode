@@ -16,6 +16,7 @@ public:
 
     SymbolLocation findSymbolLocation(const QString &symbolName) const override;
     void indexDirectory(const QString &directoryPath) override; // Called from main thread
+    QStringList allSymbols() const override;
 
 public slots:
     void doIndexDirectory(const QString &directoryPath); // This will run in the thread

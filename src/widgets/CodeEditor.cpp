@@ -8,9 +8,11 @@
 #include <QTextCursor>
 #include <QDebug>
 #include <QFontDatabase>
+#include <QStringListModel>
+#include <QScrollBar>
 
-CodeEditor::CodeEditor(QWidget *parent)
-    : QPlainTextEdit(parent)
+CodeEditor::CodeEditor(ISymbolProvider *provider, QWidget *parent)
+    : QPlainTextEdit(parent), symbolProvider(provider), completer(new QCompleter(this))
 {
     lineNumberArea = new LineNumberArea(this);
 
@@ -30,6 +32,13 @@ CodeEditor::CodeEditor(QWidget *parent)
     setFont(font);
 
     highlighter = new PHPSyntaxHighlighter(document());
+
+    completer->setWidget(this);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    connect(completer, QOverload<const QString &>::of(&QCompleter::activated),
+            this, &CodeEditor::insertCompletion);
+    updateCompleter();
 }
 
 int CodeEditor::lineNumberAreaWidth()
@@ -141,3 +150,72 @@ void CodeEditor::mouseMoveEvent(QMouseEvent *event)
     }
     QPlainTextEdit::mouseMoveEvent(event);
 }
+
+void CodeEditor::keyPressEvent(QKeyEvent *event)
+{
+    if (completer && completer->popup()->isVisible()) {
+        switch (event->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Escape:
+        case Qt::Key_Tab:
+        case Qt::Key_Backtab:
+            event->ignore();
+            return; // let completer handle these
+        default:
+            break;
+        }
+    }
+
+    QPlainTextEdit::keyPressEvent(event);
+
+    QString prefix = textUnderCursor();
+    if (!prefix.isEmpty()) {
+        completer->setCompletionPrefix(prefix);
+        QRect rect = cursorRect();
+        rect.setWidth(completer->popup()->sizeHintForColumn(0)
+                       + completer->popup()->verticalScrollBar()->sizeHint().width());
+        completer->complete(rect);
+    } else {
+        completer->popup()->hide();
+    }
+}
+
+void CodeEditor::focusInEvent(QFocusEvent *event)
+{
+    if (completer)
+        completer->setWidget(this);
+    QPlainTextEdit::focusInEvent(event);
+}
+
+void CodeEditor::insertCompletion(const QString &completion)
+{
+    QTextCursor cursor = textCursor();
+    cursor.select(QTextCursor::WordUnderCursor);
+    cursor.insertText(completion);
+    setTextCursor(cursor);
+}
+
+QString CodeEditor::textUnderCursor() const
+{
+    QTextCursor cursor = textCursor();
+    cursor.select(QTextCursor::WordUnderCursor);
+    return cursor.selectedText();
+}
+
+void CodeEditor::setSymbolProvider(ISymbolProvider *provider)
+{
+    symbolProvider = provider;
+    updateCompleter();
+}
+
+void CodeEditor::updateCompleter()
+{
+    if (!completer)
+        return;
+    QStringList words;
+    if (symbolProvider)
+        words = symbolProvider->allSymbols();
+    completer->setModel(new QStringListModel(words, completer));
+}
+
