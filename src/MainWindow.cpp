@@ -194,7 +194,7 @@ void MainWindow::setupConnections()
 
 void MainWindow::newFile()
 {
-    CodeEditor *editor = new CodeEditor();
+    CodeEditor *editor = new CodeEditor(symbolProvider);
     int index = tabWidget->addTab(editor, "Untitled");
     tabWidget->setCurrentIndex(index);
     connect(editor, &CodeEditor::goToDefinitionRequested, this, &MainWindow::goToDefinition);
@@ -210,7 +210,7 @@ void MainWindow::openFile(const QString &filePath)
         return;
     }
 
-    CodeEditor *editor = new CodeEditor();
+    CodeEditor *editor = new CodeEditor(symbolProvider);
     editor->setPlainText(file.readAll());
     file.close();
 
@@ -371,4 +371,10 @@ void MainWindow::onIndexingFinished()
     indexingProgressBar->setValue(100);
     indexingStatusLabel->setText("Ready");
     indexingProgressBar->hide();
+
+    for (int i = 0; i < tabWidget->count(); ++i) {
+        if (CodeEditor *editor = qobject_cast<CodeEditor*>(tabWidget->widget(i))) {
+            editor->setSymbolProvider(symbolProvider);
+        }
+    }
 }
