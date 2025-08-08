@@ -295,7 +295,7 @@ void MainWindow::readTerminalOutput()
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if (terminalInput->isVisible() && terminalInput->isEnabled()) {
+    if (terminalInput->isVisible() && terminalInput->isEnabled() && !event->text().isEmpty() && !terminalInput->hasFocus()) {
         terminalInput->setFocus();
     }
     QMainWindow::keyPressEvent(event);
