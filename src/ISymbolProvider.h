@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMap>
+#include <QStringList>
 
 struct SymbolLocation {
     QString filePath;
@@ -18,6 +19,9 @@ public:
 
     // Method to index a directory (e.g., when a folder is opened)
     virtual void indexDirectory(const QString &directoryPath) = 0;
+
+    // Retrieve all indexed symbol names for completion
+    virtual QStringList allSymbols() const = 0;
 };
 
 #endif // ISYMBOLPROVIDER_H
