@@ -13,9 +13,8 @@
 #include <QMessageBox>
 #include <QFile>
 #include <QTextStream>
-#include <QSplitter>
+#include <QDockWidget>
 #include <QVBoxLayout>
-#include <QHBoxLayout>
 #include <QDebug>
 #include <QDir>
 #include <QTextBlock>
@@ -77,6 +76,7 @@ void MainWindow::createWidgets()
     treeView->setColumnHidden(1, true);
     treeView->setColumnHidden(2, true);
     treeView->setColumnHidden(3, true);
+    treeView->setHeaderHidden(true);
 
     terminalOutput = new QPlainTextEdit(this);
     terminalOutput->setReadOnly(true); // Make it read-only for historical output
@@ -116,24 +116,24 @@ void MainWindow::createWidgets()
 void MainWindow::setupLayout()
 {
     qDebug() << "setupLayout started.";
-    QSplitter *mainSplitter = new QSplitter(Qt::Horizontal, this);
-    setCentralWidget(mainSplitter);
 
-    QSplitter *editorSplitter = new QSplitter(Qt::Vertical, mainSplitter);
+    setCentralWidget(tabWidget);
 
-    QWidget *terminalWidget = new QWidget(editorSplitter);
+    // Explorer dock
+    QDockWidget *explorerDock = new QDockWidget(tr("Explorer"), this);
+    explorerDock->setWidget(treeView);
+    addDockWidget(Qt::LeftDockWidgetArea, explorerDock);
+
+    // Terminal dock
+    QWidget *terminalWidget = new QWidget(this);
     QVBoxLayout *terminalLayout = new QVBoxLayout(terminalWidget);
     terminalLayout->setContentsMargins(0, 0, 0, 0);
     terminalLayout->addWidget(terminalOutput);
     terminalLayout->addWidget(terminalInput);
 
-    editorSplitter->addWidget(tabWidget);
-    editorSplitter->addWidget(terminalWidget);
-    editorSplitter->setSizes({600, 200});
-
-    mainSplitter->addWidget(treeView);
-    mainSplitter->addWidget(editorSplitter);
-    mainSplitter->setSizes({250, 950});
+    QDockWidget *terminalDock = new QDockWidget(tr("Terminal"), this);
+    terminalDock->setWidget(terminalWidget);
+    addDockWidget(Qt::BottomDockWidgetArea, terminalDock);
 
     // Status bar for indexing progress
     indexingStatusLabel = new QLabel("Ready");
