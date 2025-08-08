@@ -23,6 +23,11 @@ SymbolLocation SimpleSymbolIndexer::findSymbolLocation(const QString &symbolName
     return SymbolLocation{"", -1}; // Not found
 }
 
+QStringList SimpleSymbolIndexer::allSymbols() const
+{
+    return symbolMap.keys();
+}
+
 void SimpleSymbolIndexer::indexDirectory(const QString &directoryPath)
 {
     // This method is called from the main thread to initiate indexing in the worker thread
